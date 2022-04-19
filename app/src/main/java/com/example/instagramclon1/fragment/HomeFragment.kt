@@ -95,6 +95,13 @@ class HomeFragment : BaseFragment() {
         })
     }
 
+    fun likeOrUnLikePost(post : Post){
+        val uid=AuthManager.currentUser()!!.uid
+        DatabaseManager.likeFeedPost(uid,post)
+    }
+
+
+
     /**
      * This interface is created for communication with UploadFragment
      */

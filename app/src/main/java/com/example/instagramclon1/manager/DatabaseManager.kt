@@ -108,6 +108,14 @@ object DatabaseManager {
         }
     }
 
+    fun likeFeedPost(uid: String, post: Post) {
+        database.collection(USER_PATH).document(uid).collection(FEED_PATH).document(post.id)
+            .update("isLiked", post.isLiked)
+        if (uid == post.uid)
+            database.collection(USER_PATH).document(uid).collection(POST_PATH).document(post.id)
+                .update("isLiked", post.isLiked)
+    }
+
     fun loadFollowers(uid:String,handler: DBUsersHandler) {
         database.collection(USER_PATH).document(uid).collection(FOLLOWERS_PATH).get().addOnCompleteListener {
             val users = ArrayList<User>()
@@ -240,12 +248,47 @@ object DatabaseManager {
                     val fullname = document.getString("fullname")
                     val userImg = document.getString("userImg")
                     val currentDate = document.getString("currentDate")
+                    var isLiked = document.getBoolean("isLiked")
+                    if (isLiked == null) isLiked = false
+                    val userId = document.getString("uid")
 
                     val post = Post(id!!, caption!!, postImg!!)
                     post.uid = uid
                     post.fullname = fullname!!
                     post.userImg = userImg!!
                     post.currentDate = currentDate!!
+                    posts.add(post)
+                }
+                handler.onSuccess(posts)
+            } else {
+                handler.onError(it.exception!!)
+            }
+        }
+    }
+
+    fun loadLikedFeeds(uid: String, handler: DBPostsHandler) {
+        val reference = database.collection(USER_PATH).document(uid).collection(FEED_PATH)
+            .whereEqualTo("isLiked", true)
+        reference.get().addOnCompleteListener {
+            val posts = ArrayList<Post>()
+            if (it.isSuccessful) {
+                for (document in it.result!!) {
+                    val id = document.getString("id")
+                    val caption = document.getString("caption")
+                    val postImg = document.getString("postImg")
+                    val fullname = document.getString("fullname")
+                    val userImg = document.getString("userImg")
+                    val currentDate = document.getString("currentDate")
+                    var isLiked = document.getBoolean("isLiked")
+                    if (isLiked == null) isLiked = false
+                    val userId = document.getString("uid")
+
+                    val post = Post(id!!, caption!!, postImg!!)
+                    post.uid = userId!!
+                    post.fullname = fullname!!
+                    post.userImg = userImg!!
+                    post.currentDate = currentDate!!
+                    post.isLiked = isLiked
                     posts.add(post)
                 }
                 handler.onSuccess(posts)
