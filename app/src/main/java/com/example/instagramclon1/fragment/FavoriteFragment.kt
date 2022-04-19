@@ -11,7 +11,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.instagramclon1.R
 import com.example.instagramclon1.adapter.FavoriteAdapter
+import com.example.instagramclon1.manager.AuthManager
+import com.example.instagramclon1.manager.DatabaseManager
+import com.example.instagramclon1.manager.handler.DBPostHandler
+import com.example.instagramclon1.manager.handler.DBPostsHandler
 import com.example.instagramclon1.model.Post
+import com.example.instagramclon1.utils.DialogListener
+import com.example.instagramclon1.utils.Utils
 
 
 class FavoriteFragment : BaseFragment() {
@@ -29,11 +35,59 @@ class FavoriteFragment : BaseFragment() {
         recyclerView.setLayoutManager(GridLayoutManager(activity, 1))
 
         refreshAdapter(loadPosts())
+        loadLikedFeeds()
     }
+
+
 
     private fun refreshAdapter(items: ArrayList<Post>) {
         val adapter = FavoriteAdapter(this, items)
         recyclerView.adapter = adapter
+    }
+
+    fun likeOrUnlikePost(post: Post) {
+        val uid = AuthManager.currentUser()!!.uid
+        DatabaseManager.likeFeedPost(uid, post)
+
+        loadLikedFeeds()
+    }
+
+    fun loadLikedFeeds() {
+        showLoading(requireActivity())
+        val uid = AuthManager.currentUser()!!.uid
+        DatabaseManager.loadLikedFeeds(uid, object : DBPostsHandler {
+            override fun onSuccess(posts: ArrayList<Post>) {
+                dismissLoading()
+                refreshAdapter(posts)
+            }
+
+            override fun onError(e: Exception) {
+                dismissLoading()
+            }
+        })
+    }
+
+    fun showDeleteDialog(post: Post){
+        Utils.dialogDouble(requireContext(), getString(R.string.str_delete_post), object :
+            DialogListener {
+            override fun onCallback(isChosen: Boolean) {
+                if(isChosen){
+                    deletePost(post)
+                }
+            }
+        })
+    }
+
+    fun deletePost(post: Post) {
+        DatabaseManager.deletePost(post, object : DBPostHandler {
+            override fun onSuccess(post: Post) {
+                loadLikedFeeds()
+            }
+
+            override fun onError(e: Exception) {
+
+            }
+        })
     }
 
     private fun loadPosts():ArrayList<Post>{

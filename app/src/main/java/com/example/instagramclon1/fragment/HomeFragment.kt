@@ -15,8 +15,11 @@ import com.example.instagramclon1.R
 import com.example.instagramclon1.adapter.HomeAdapter
 import com.example.instagramclon1.manager.AuthManager
 import com.example.instagramclon1.manager.DatabaseManager
+import com.example.instagramclon1.manager.handler.DBPostHandler
 import com.example.instagramclon1.manager.handler.DBPostsHandler
 import com.example.instagramclon1.model.Post
+import com.example.instagramclon1.utils.DialogListener
+import com.example.instagramclon1.utils.Utils
 
 import java.lang.Exception
 
@@ -101,7 +104,28 @@ class HomeFragment : BaseFragment() {
     }
 
 
+    fun showDeleteDialog(post: Post){
+        Utils.dialogDouble(requireContext(), getString(R.string.str_delete_post), object :
+            DialogListener {
+            override fun onCallback(isChosen: Boolean) {
+                if(isChosen){
+                    deletePost(post)
+                }
+            }
+        })
+    }
 
+    fun deletePost(post: Post) {
+        DatabaseManager.deletePost(post, object : DBPostHandler {
+            override fun onSuccess(post: Post) {
+                loadMyFeeds()
+            }
+
+            override fun onError(e: Exception) {
+
+            }
+        })
+    }
     /**
      * This interface is created for communication with UploadFragment
      */

@@ -9,10 +9,12 @@ import android.widget.TextView
 import com.example.instagramclon1.R
 import com.example.instagramclon1.manager.AuthManager
 import com.example.instagramclon1.manager.DatabaseManager
+import com.example.instagramclon1.manager.PrefsManager
 import com.example.instagramclon1.manager.handler.AuthHandler
 import com.example.instagramclon1.manager.handler.DBUserHandler
 import com.example.instagramclon1.model.User
 import com.example.instagramclon1.utils.Extensions.toast
+import com.example.instagramclon1.utils.Utils
 
 import java.lang.Exception
 
@@ -69,6 +71,8 @@ class SignUpActivity : BaseActivity() {
     }
 
     private fun storeUserToDB(user: User){
+        user.device_token = PrefsManager(this).loadDeviceToken()!!
+        user.device_id = Utils.getDeviceID(this)
         DatabaseManager.storeUser(user, object: DBUserHandler {
 
             override fun onSuccess(user: User?) {

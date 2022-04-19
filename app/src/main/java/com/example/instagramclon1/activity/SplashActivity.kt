@@ -9,6 +9,10 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.example.instagramclon1.R
 import com.example.instagramclon1.manager.AuthManager
+import com.example.instagramclon1.manager.PrefsManager
+import com.example.instagramclon1.utils.Logger
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 
 
 /**
@@ -29,6 +33,7 @@ class SplashActivity : BaseActivity() {
 
     private fun initViews() {
         countDownTimer()
+        loadFCMToken()
     }
 
     private fun countDownTimer() {
@@ -42,5 +47,19 @@ class SplashActivity : BaseActivity() {
                 }
             }
         }.start()
+    }
+
+    private fun loadFCMToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Logger.d(TAG, "Fetching FCM registration token failed")
+                return@OnCompleteListener
+            }
+            // Get new FCM registration token
+            // Save it in locally to use later
+            val token = task.result
+            Logger.d(TAG, token.toString())
+           PrefsManager(this).storeDeviceToken(token.toString())
+        })
     }
 }
