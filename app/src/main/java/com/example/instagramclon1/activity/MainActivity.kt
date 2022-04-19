@@ -21,7 +21,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
  * and pages can be controlled by BottomNavigationView
  */
 class MainActivity : BaseActivity(), HomeFragment.HomeListener, UploadFragment.UploadListener {
-    val T AG = MainActivity::class.java.simpleName
+    val TAG = MainActivity::class.java.simpleName
     var index = 0
     lateinit var homeFragment: HomeFragment
     lateinit var uploadFragment: UploadFragment

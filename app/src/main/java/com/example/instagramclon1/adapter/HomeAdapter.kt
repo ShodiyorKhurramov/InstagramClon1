@@ -71,9 +71,9 @@ class HomeAdapter(var fragment: HomeFragment, var items: ArrayList<Post>): BaseA
             }else{
                 iv_more.visibility = View.GONE
             }
-//            iv_more.setOnClickListener {
-//                fragment.showDeleteDialog(post)
-//            }
+            iv_more.setOnClickListener {
+                fragment.showDeleteDialog(post)
+            }
         }
     }
         }

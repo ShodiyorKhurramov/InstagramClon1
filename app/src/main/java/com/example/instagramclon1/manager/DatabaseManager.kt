@@ -297,4 +297,20 @@ object DatabaseManager {
             }
         }
     }
+
+    fun deletePost(post: Post, handler: DBPostHandler) {
+        val reference1 = database.collection(USER_PATH).document(post.uid).collection(POST_PATH)
+        reference1.document(post.id).delete().addOnSuccessListener {
+
+            val reference2 = database.collection(USER_PATH).document(post.uid).collection(FEED_PATH)
+            reference2.document(post.id).delete().addOnSuccessListener {
+                handler.onSuccess(post)
+            }.addOnFailureListener {
+                handler.onError(it)
+            }
+
+        }.addOnFailureListener {
+            handler.onError(it)
+        }
+    }
 }
