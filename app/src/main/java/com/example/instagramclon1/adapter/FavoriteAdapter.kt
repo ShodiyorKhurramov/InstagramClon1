@@ -56,9 +56,9 @@ class FavoriteAdapter(var fragment: FavoriteFragment, var items: ArrayList<Post>
             }else{
                 iv_more.visibility = View.GONE
             }
-            iv_more.setOnClickListener {
-                fragment.showDeleteDialog(post)
-            }
+//            iv_more.setOnClickListener {
+//                fragment.showDeleteDialog(post)
+//            }
         }
 
     }
